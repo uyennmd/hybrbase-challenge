@@ -1,114 +1,142 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+"use client";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import { GetServerSideProps } from "next";
+import { fetchProducts } from "@/lib/contentful";
+import { use, useEffect, useState } from "react";
+import {
+  Box,
+  createListCollection,
+  Flex,
+  Grid,
+  GridItem,
+  Group,
+  Heading,
+  HStack,
+  Separator,
+  Text,
+} from "@chakra-ui/react";
+import Layout from "@/components/Layout";
+import { SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectRoot,
+  SelectTrigger,
+  SelectValueText, } from "@/components/ui/select";
+import ProductCard from "@/components/ProductCard";
+import { Button } from "@/components/ui/button";
+import {
+  PaginationItems,
+  PaginationNextTrigger,
+  PaginationPrevTrigger,
+  PaginationRoot,
+} from "@/components/ui/pagination";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+import { Product } from "../types/product";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export default function Home() {
-  return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+interface HomeProps {
+  products: Product[];
 }
+
+const pageSize = 4;
+const categories = ["All", "Dress", "Shoe", "Shirt", "Skirt"];
+const sortOptions = ["Popular", "Alphabetical"];
+
+const Home = ({ products }: HomeProps) => {
+  const [page, setPage] = useState(1);
+  const [category, setCategory] = useState("All");
+  const [sortOption, setSortOption] = useState("Popular");
+  const [visibleProducts, setVisibleProducts] = useState(products);
+  const [totalProducts, setTotalProducts] = useState(products.length);
+
+  // Pagination
+  const startRange = (page - 1) * pageSize;
+  const endRange = startRange + pageSize;
+
+  useEffect(() => {
+    // Filter by category (if applicable)
+    const filteredProducts =
+    category === "All"
+      ? products
+      : products.filter((product) => product.fields.category === category);
+
+    // Sort logic (example: popular or alphabetical)
+    const sortedProducts =
+    sortOption === "Popular"
+      ? filteredProducts // Assuming default order is by popularity
+      : [...filteredProducts].sort((a, b) =>
+          a.fields.name.localeCompare(b.fields.name)
+        );
+    setVisibleProducts(sortedProducts);
+    setTotalProducts(sortedProducts.length);
+    setPage(1)
+  }, [category, sortOption]);
+
+  return (
+    <Layout>
+      <Box rounded="sm" py="30px">
+        <Flex direction={"column"} gap="7">
+          <Heading as="h1" fontSize="5xl" fontWeight="bold">E-Commerce</Heading>
+          <Text paddingEnd="600px" fontSize="xl">Revamp your style with the latest designer trends in clothing or achieve a perfectly curated wardrobe thanks to our line-up of timeless pieces.</Text>
+        </Flex>
+      </Box>
+      <Separator />
+      {/* Filters and Sort */}
+      <Flex justify="space-between" align="center" my={8}>
+        <Group>
+          {categories.map((cat) => (
+            <Button
+              key={cat}
+              onClick={() => setCategory(cat)}
+              variant={category === cat ? "solid" : "outline"}
+            >
+              {cat}
+            </Button>
+          ))}
+          </Group>
+        <Flex align="center" gap={4} w={"200px"}>
+          <SegmentedControl
+            value={sortOption}
+            onValueChange={(e) => setSortOption(e.value)}
+            items={sortOptions}
+          />
+        </Flex>
+      </Flex>
+      {/* Product Grid */}
+      <Grid templateColumns="repeat(4, 1fr)" gap={6}>
+        {visibleProducts.slice(startRange, endRange).map((product) => (
+          <GridItem key={product.sys.id}>
+            <ProductCard {...product} />
+          </GridItem>
+        ))}
+      </Grid>
+
+      {/* Pagination */}
+      <Box mt={8}>
+        <PaginationRoot
+          page={page}
+          count={totalProducts}
+          pageSize={pageSize}
+          onPageChange={(e) => setPage(e.page)}
+        >
+          <HStack justify="center">
+            <PaginationPrevTrigger />
+            <PaginationItems />
+            <PaginationNextTrigger />
+          </HStack>
+        </PaginationRoot>
+      </Box>
+    </Layout>
+  );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const products = await fetchProducts();
+  console.log(products);
+  return {
+    props: {
+      products,
+    },
+  };
+};
+
+export default Home;
