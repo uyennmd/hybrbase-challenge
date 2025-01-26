@@ -2,10 +2,9 @@
 
 import { GetServerSideProps } from "next";
 import { fetchProducts } from "@/lib/contentful";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
-  createListCollection,
   Flex,
   Grid,
   GridItem,
@@ -16,12 +15,6 @@ import {
   Text,
 } from "@chakra-ui/react";
 import Layout from "@/components/Layout";
-import { SelectContent,
-  SelectItem,
-  SelectLabel,
-  SelectRoot,
-  SelectTrigger,
-  SelectValueText, } from "@/components/ui/select";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import {
@@ -69,7 +62,7 @@ const Home = ({ products }: HomeProps) => {
     setVisibleProducts(sortedProducts);
     setTotalProducts(sortedProducts.length);
     setPage(1)
-  }, [category, sortOption]);
+  }, [category, sortOption, products]);
 
   return (
     <Layout>

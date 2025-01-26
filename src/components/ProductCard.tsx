@@ -1,5 +1,4 @@
 import { Image, Link, Text, Badge, Center, Card, Flex } from '@chakra-ui/react';
-import { Button } from './ui/button';
 import { Product } from '../types/product';
 
 const ProductCard = (product: Product) => (

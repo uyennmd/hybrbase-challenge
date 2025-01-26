@@ -1,4 +1,4 @@
-import { Box, Flex, Link, Text, Container, Bleed, Heading } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import Header from './Header';
 import Footer from './Footer';
 import { ColorModeProvider } from "@/components/ui/color-mode"
