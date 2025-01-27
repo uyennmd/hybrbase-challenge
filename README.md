@@ -1,40 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Hybrbase Challenge
 
-## Getting Started
+This project is a Next.js application that uses Chakra UI for styling and integrates Contentful as the CMS for managing content. The application demonstrates the use of pagination, filtering, and server-side rendering for dynamic product display.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Features
+
+- **Dynamic Product Display**: Displays products fetched from Contentful, categorized and paginated for better user experience.
+- **Pagination**: Implements efficient pagination using Chakra UI.
+- **Filtering**: Filters products by category.
+- **Contentful Integration**: Manages content dynamically via Contentful CMS.
+- **Server-Side Rendering (SSR)**: Uses `getServerSideProps` for pre-rendering pages with fresh data on each request.
+- **Chakra UI**: Provides responsive and accessible UI components.
+
+---
+
+## Tech Stack
+
+- **Framework**: [Next.js](https://nextjs.org/) 15.1.5
+- **Styling**: [Chakra UI](https://chakra-ui.com/)
+- **CMS**: [Contentful](https://www.contentful.com/)
+- **Language**: TypeScript
+
+---
+
+## Installation
+
+### Prerequisites
+
+- Node.js (>= 14.x)
+- npm
+
+### Steps
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/uyennmd/hybrbase-challenge.git
+   cd hybrbase-challenge
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables: Create a `.env.local` file in the root directory and add the following:
+
+   ```env
+   CONTENTFUL_SPACE_ID=4rj22o8020xl
+   CONTENTFUL_ACCESS_TOKEN=gJ6VYwJukW_XS7hUARXTimIB6T-pXDh3GlTcamtqfRI
+   ```
+
+4. Run the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) to view the app in the browser.
+
+5. To build for production:
+
+   ```bash
+   npm run build
+   ```
+
+---
+
+## Deployment
+
+This application is deployed using Vercel. To deploy:
+
+1. Push your code to GitHub.
+2. Link your GitHub repository to Vercel.
+3. Add the environment variables (`CONTENTFUL_SPACE_ID` and `CONTENTFUL_ACCESS_TOKEN`) in the Vercel dashboard under **Settings > Environment Variables**.
+4. Deploy the application.
+
+---
+
+## File Structure
+
+```
+.
+├── components          # Reusable UI components
+├── lib                 # Contentful client and utility functions
+├── pages               # Next.js pages
+├── public              # Static assets
+├── styles              # Global styles
+├── .env.local          # Environment variables
+├── next.config.ts      # Next.js configuration
+└── tsconfig.json       # TypeScript configuration
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### Common Errors
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+- **Missing Environment Variables**: If you encounter `TypeError: Expected parameter accessToken`, ensure your `.env.local` file is correctly configured and contains valid values for `CONTENTFUL_SPACE_ID` and `CONTENTFUL_ACCESS_TOKEN`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+- **Tailwind CSS Warning**: Ensure your `tailwind.config.js` file includes the correct `content` paths.
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Debugging Steps
 
-## Learn More
+1. Check environment variables using `console.log` in `next.config.ts`.
+2. Verify Contentful API keys in your Contentful account.
+3. Restart the development server after updating environment variables.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+## Author
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+Nguyen Minh Duy Uyen
